@@ -19,7 +19,24 @@ class ExportsController extends Controller
     public function index()
     {
         $exports = Exports::all();
-        return new ExportsCollection($exports);
+        return response(new ExportsCollection($exports),200);
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getUnextractedExport()
+    {
+        $exports = Exports::where('extracted',false)->get();
+        if($exports){
+            return response(new ExportsCollection($exports),200);
+        }
+        else{
+            return response([],200);
+        }
+
     }
 
     /**
@@ -40,10 +57,17 @@ class ExportsController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {   $export = new Exports;
-
+    {
+        // validation
+        $request->validate([
+            "agent"=>"required",
+            "acceptTerms"=>"required|boolean|accepted",
+            "containers" => "required|array",
+        ]);
+        $export = new Exports;
         DB::transaction(function () use($request, $export) {
             $export->agent = $request->agent;
+            $export->acceptTerms = $request->acceptTerms;
             $export->save();
             foreach ($request->containers as $contain) {
                 $container = new ContainerInfo;
@@ -61,8 +85,25 @@ class ExportsController extends Controller
             }
         });
 
-        return new ExportsResource($export);
+        return response(new ExportsResource($export),200);
     }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function markAsExtracted(Request $request)
+    {
+        // validation
+        $request->validate([
+            "exportIds"=>"array|required",
+        ]);
+        Exports::whereIn("id",$request->exportIds)->update(["extracted"=>true]);
+        return response(["message"=>"Exports marked as extracted"],200);
+    }
+
 
     /**
      * Display the specified resource.

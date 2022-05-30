@@ -16,6 +16,8 @@ return new class extends Migration
         Schema::create('exports', function (Blueprint $table) {
             $table->id();
             $table->string("agent");
+            $table->boolean("acceptTerms");
+            $table->boolean("extracted")->default(false);
             $table->timestamps();
         });
     }

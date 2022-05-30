@@ -14,7 +14,8 @@ class OperatorController extends Controller
      */
     public function index()
     {
-        //
+        $operators = Operator::all();
+        return $operators;
     }
 
     /**
@@ -24,8 +25,7 @@ class OperatorController extends Controller
      */
     public function create()
     {
-        $operators = Operator::all();
-        return $operators;
+
     }
 
     /**

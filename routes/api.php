@@ -20,5 +20,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 Route::resource('exports', ExportsController::class);
-Route::get('isotypes', 'IsoTypeController@index');
-Route::get('operators', 'OperatorController@index');
+Route::get('unextracted/exports', [ExportsController::class,'getUnextractedExport']);
+Route::post('extract/exports', [ExportsController::class,'markAsExtracted']);
+Route::get('isotypes', [IsoTypeController::class,'index']);
+Route::get('operators', [OperatorController::class,'index']);
